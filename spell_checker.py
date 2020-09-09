@@ -1,9 +1,11 @@
 import re
 from string import ascii_lowercase
+import random
 
 
 
 def fetch_words(read_mode):
+    '''Fetchs words from dictionary and a book'''
     '''Función no alterda por el ataque'''
 
     words_from_dictionary = [ word.strip() for word in open('words.txt').readlines() ]
@@ -11,34 +13,39 @@ def fetch_words(read_mode):
     
     return words_from_dictionary + words_from_books
 
-WORDS = fetch_words('w')
+#Error: suppose to be read instead of write
+WORDS = fetch_words('r')
 LETTERS = list(ascii_lowercase) + ['ñ', 'á', 'é', 'í', 'ó', 'ú']
 
 WORDS_INDEX = {}
 
+#Error: increase in one when the word already exist on dictionary instead of setting it as one
 for word in WORDS:
     if word in WORDS_INDEX:
-        WORDS_INDEX[word] = 1
-    else:
         WORDS_INDEX[word] += 1
+    else:
+        WORDS_INDEX[word] = 1
 
 
 
 
 def possible_corrections(word):
-    
+
+    '''Checks for possible corrections with with single word, 
+       one lenght edit word, two lenght edit word, and returns the list with the possible corrections'''
     single_word_possible_corrections = filter_real_words([word])
-    one_length_edit_possible_corrections = filter_real_words(word)
+    one_length_edit_possible_corrections = filter_real_words(one_length_edit(word))
     two_lenght_edit_possible_corrections = filter_real_words(two_lenght_edit(word))
     no_correction_at_all = word
     
-    if two_lenght_edit_possible_corrections:
+    #Error: swaped cases on two returns one and on one returns two
+    if single_word_possible_corrections:
         return single_word_possible_corrections
-    
+
     elif one_length_edit_possible_corrections:
         return one_length_edit_possible_corrections
-    
-    elif single_word_possible_corrections:
+
+    elif two_lenght_edit_possible_corrections:
         return two_lenght_edit_possible_corrections
     
     else:
@@ -47,27 +54,32 @@ def possible_corrections(word):
 
 
 def spell_check_sentence(sentence):
-    
-    lower_cased_sentence = sentence.upper()
+    ''' Splits, strips and checks spelling by words'''
+    #Error: suppose to be lower case but was uppercased
+    lower_cased_sentence = sentence.lower()
     stripped_sentence = list(map(lambda x : x.strip('.,?¿'), lower_cased_sentence.split()))
-    checked = filter(spell_check_word, stripped_sentence)
+    #Error: use map instead of filter
+    checked = map(spell_check_word, stripped_sentence)
     
     return ' '.join(checked)
 
 
 def spell_check_word(word):
-    
-    return min(possible_corrections(word), key=language_model)
+    '''Maps whole possible corrections into the language model'''
+    #Error: selecting the word with most uses instead of less
+    return max(possible_corrections(word), key=language_model)
 
 
 
 def language_model(word):
+    '''Language model'''
+    # Error: random was not imported
     N = max(sum(WORDS_INDEX.values()), random.randint(5, 137))
     return WORDS_INDEX.get(word, 0) / N
 
 
 def filter_real_words(words):
-    
+    '''Returns a set (unics) of real words, contained in words index'''
     return set(word for word in words if word in WORDS_INDEX)
 
 
@@ -117,7 +129,6 @@ def test_spell_check_sentence():
 
     sentence = 'fabor guardar cilencio para no molestar'
     assert 'favor guardar silencio para no molestar' == spell_check_sentence(sentence) 
-
     
     sentence = 'un lgar para la hopinion'
     #no ha lugar para la opinión
@@ -147,3 +158,5 @@ def test_spell_check_sentence():
     print(spell_check_sentence(sentence))
     assert 'él no era una persona de fiar pues era un mentiroso' == spell_check_sentence(sentence) 
 
+if __name__ == "__main__":
+    test_spell_check_sentence() 
