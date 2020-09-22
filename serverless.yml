@@ -64,6 +64,12 @@ functions:
       - http:
           path: spellcheck
           method: post
+  similarity:
+    handler: handler.similarity
+    events:
+      - http:
+          path: similarity
+          method: post
 
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
