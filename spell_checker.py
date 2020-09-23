@@ -34,6 +34,7 @@ def possible_corrections(word):
     '''Checks for possible corrections with with single word, 
        one lenght edit word, two lenght edit word, and returns the list with the possible corrections'''
     single_word_possible_corrections = filter_real_words([word])
+    accent_possible_corrections = filter_real_words(accent_check(word))
     one_length_edit_possible_corrections = filter_real_words(one_length_edit(word))
     two_lenght_edit_possible_corrections = filter_real_words(two_lenght_edit(word))
     no_correction_at_all = word
@@ -41,6 +42,9 @@ def possible_corrections(word):
     #Error: swaped cases on two returns one and on one returns two
     if single_word_possible_corrections:
         return single_word_possible_corrections
+    
+    elif accent_possible_corrections:
+        return accent_possible_corrections
 
     elif one_length_edit_possible_corrections:
         return one_length_edit_possible_corrections
@@ -95,6 +99,14 @@ def filter_real_words(words):
     '''Returns a set (unics) of real words, contained in words index'''
     return set(word for word in words if word in WORDS_INDEX)
 
+def accent_check (word):
+    ''' Checks for each vocal and return a list of words '''
+    vocals = {'a':'á', 'e':'é', 'i':'í','o':'ó','u':'ú'}
+    possible_words = []
+    for char in word:
+        if char in 'aeiou':
+            possible_words.append(word.replace(char, vocals[char], 1))
+    return possible_words
 
 def one_length_edit(word):
     '''Función no alterda por el ataque'''
