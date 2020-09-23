@@ -55,13 +55,26 @@ def possible_corrections(word):
 
 def spell_check_sentence(sentence):
     ''' Splits, strips and checks spelling by words'''
+    
+    #save capitalized words
+    caps = [word[0].isupper() for word in sentence.split()]
+
+    #save punctuations signs
+    punctuations = [word[-1] if word[-1] in '.,?¿'else '' for word in sentence.split()]
+    
     #Error: suppose to be lower case but was uppercased
     lower_cased_sentence = sentence.lower()
     stripped_sentence = list(map(lambda x : x.strip('.,?¿'), lower_cased_sentence.split()))
     #Error: use map instead of filter
     checked = map(spell_check_word, stripped_sentence)
-    
-    return ' '.join(checked)
+
+    with_punctuations_and_caps = []
+
+    # put back the punctuations signs and capitalize words if needed 
+    for word, punctuation, cap in zip(checked, punctuations, caps):
+        with_punctuations_and_caps.append('{}{}'.format(word.capitalize() if cap else word, punctuation))        
+
+    return ' '.join(with_punctuations_and_caps)
 
 
 def spell_check_word(word):
